@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd apps/web && npm install && npm run build",
+  "installCommand": "corepack enable && pnpm install --no-frozen-lockfile",
+  "buildCommand": "corepack enable && pnpm --filter @skillhub/web build",
   "outputDirectory": "apps/web/.next",
-  "installCommand": "cd apps/web && npm install",
   "framework": "nextjs"
 }
