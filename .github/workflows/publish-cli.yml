@@ -9,18 +9,58 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org
 
-      - run: npm install -g pnpm@9.15.9
-      - run: pnpm install
-      - run: pnpm --filter fateskill-cli build
+      - name: Validate publish inputs
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
 
-      - run: npm publish --access public
+          if [ -z "${NPM_TOKEN:-}" ]; then
+            echo "::error title=Missing NPM_TOKEN::Configure an npm Automation token with publish permissions in Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+          if [[ "${GITHUB_REF_NAME}" != cli@* ]]; then
+            echo "::error title=Invalid tag::Expected a tag that starts with cli@, for example cli@0.1.0. Got: ${GITHUB_REF_NAME}"
+            exit 1
+          fi
+
+          TAG_VERSION="${GITHUB_REF_NAME#cli@}"
+          PACKAGE_VERSION="$(node -p "require('./packages/cli/package.json').version")"
+          PACKAGE_NAME="$(node -p "require('./packages/cli/package.json').name")"
+
+          echo "Publishing ${PACKAGE_NAME}@${PACKAGE_VERSION} from tag ${GITHUB_REF_NAME}"
+
+          if [ "${TAG_VERSION}" != "${PACKAGE_VERSION}" ]; then
+            echo "::error title=Tag/package version mismatch::Tag version ${TAG_VERSION} does not match packages/cli/package.json version ${PACKAGE_VERSION}."
+            exit 1
+          fi
+
+      - name: Install pnpm
+        run: npm install -g pnpm@9.15.9
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build CLI
+        run: pnpm --filter fateskill-cli build
+
+      - name: Verify npm authentication
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm whoami
+
+      - name: Publish CLI package
+        run: npm publish --access public
         working-directory: packages/cli
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
