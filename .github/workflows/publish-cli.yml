@@ -59,6 +59,11 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm whoami
 
+      - name: Write .npmrc into packages/cli
+        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > packages/cli/.npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish CLI package
         run: npm publish --access public
         working-directory: packages/cli
