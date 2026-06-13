@@ -254,7 +254,7 @@ fofa-tabela-docx-1.2.0.skill  (ZIP)
 Base URL:
 
 ```
-https://fateskill.dev/api/v1
+https://fateskill.vercel.app/api/v1
 ```
 
 ### Endpoints
@@ -345,7 +345,7 @@ Ficheiro `~/.fateskill/config.json` (criado automaticamente):
 
 ```json
 {
-  "registry": "https://fateskill.dev/api/v1",
+  "registry": "https://fateskill.vercel.app/api/v1",
   "install_dir": "~/.fateskill/skills",
   "auth_token": "shb_xxxxxxxxxxxx"
 }
@@ -354,7 +354,7 @@ Ficheiro `~/.fateskill/config.json` (criado automaticamente):
 Variáveis de ambiente opcionais:
 
 ```bash
-FATESKILL_REGISTRY=https://fateskill.dev/api/v1
+FATESKILL_REGISTRY=https://fateskill.vercel.app/api/v1
 FATESKILL_INSTALL_DIR=~/.fateskill/skills
 FATESKILL_TOKEN=shb_xxxxxxxxxxxx
 ```
@@ -408,7 +408,7 @@ npm publish --access public
 Qualquer agente com acesso à web pode carregar instruções sem instalar nada:
 
 ```
-GET https://fateskill.dev/api/v1/skills/fofa-tabela-docx/content/SKILL.md
+GET https://fateskill.vercel.app/api/v1/skills/fofa-tabela-docx/content/SKILL.md
 ```
 
 Retorna o `SKILL.md` em texto puro para injecção directa no contexto.
@@ -416,7 +416,7 @@ Retorna o `SKILL.md` em texto puro para injecção directa no contexto.
 ### Padrão de uso em prompt
 
 ```
-Usa a skill https://fateskill.dev/s/fofa-tabela-docx neste documento.
+Usa a skill https://fateskill.vercel.app/s/fofa-tabela-docx neste documento.
 ```
 
 O agente faz fetch à URL, carrega as instruções e executa.
