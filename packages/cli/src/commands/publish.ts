@@ -16,11 +16,23 @@ export async function publishCommand(options: { access?: "public" | "private" | 
   }
 
   const client = await apiClient();
+  spinner.text = "Uploading package to registry storage";
+  const uploadForm = new FormData();
+  uploadForm.set("name", manifest.name);
+  uploadForm.set("version", manifest.version);
+  uploadForm.set(
+    "file",
+    new Blob([await fs.readFile(packaged.filePath)], { type: "application/octet-stream" }),
+    `${manifest.name}-${manifest.version}.skill`
+  );
+
+  const { data: upload } = await client.post<{ file_url: string }>("/uploads/skills", uploadForm);
+  spinner.text = "Publishing skill metadata";
   const payload = {
     ...manifest,
     visibility: options.access ?? manifest.visibility,
     file_size: packaged.size,
-    file_url: `file://${packaged.filePath}`
+    file_url: upload.file_url
   };
   const { data } = await client.post("/skills", payload);
   spinner.succeed(`Published ${data.name}@${data.version}`);

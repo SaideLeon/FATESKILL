@@ -92,8 +92,10 @@ create unique index if not exists one_latest_version_per_skill on skill_versions
 
 create or replace view skills_public_view as
 select
+  s.id,
   s.name,
   s.slug,
+  latest.id as version_id,
   latest.version,
   s.description,
   coalesce(p.username, 'anonymous') as author,
@@ -114,7 +116,7 @@ select
 from skills s
 left join profiles p on p.id = s.author_id
 left join lateral (
-  select version, file_url, instructions
+  select id, version, file_url, instructions
   from skill_versions sv
   where sv.skill_id = s.id and sv.is_latest
   order by sv.published_at desc

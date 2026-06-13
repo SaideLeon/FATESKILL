@@ -1,6 +1,7 @@
 export type SkillVisibility = "public" | "private" | "unlisted";
 
 export type SkillSummary = {
+  id?: string;
   name: string;
   slug: string;
   version: string;
@@ -16,6 +17,7 @@ export type SkillSummary = {
 };
 
 export type SkillVersion = {
+  id?: string;
   version: string;
   changelog?: string | null;
   file_url: string;
@@ -25,6 +27,7 @@ export type SkillVersion = {
 };
 
 export type SkillDetail = SkillSummary & {
+  version_id?: string;
   entry_url: string;
   download_url: string;
   repository?: string | null;
