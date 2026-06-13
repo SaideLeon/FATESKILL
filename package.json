@@ -14,12 +14,7 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck"
   },
-  "keywords": [
-    "ai",
-    "skills",
-    "registry",
-    "cli"
-  ],
+  "keywords": ["ai", "skills", "registry", "cli"],
   "license": "MIT",
   "devDependencies": {
     "next": "^15.0.0"
