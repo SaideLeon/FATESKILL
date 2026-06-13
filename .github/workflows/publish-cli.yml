@@ -18,7 +18,7 @@ jobs:
 
       - run: npm install -g pnpm@9.15.9
       - run: pnpm install
-      - run: pnpm --filter skillhub-cli build
+      - run: pnpm --filter fateskill-cli build
 
       - run: npm publish --access public
         working-directory: packages/cli

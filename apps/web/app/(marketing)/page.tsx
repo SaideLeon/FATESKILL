@@ -7,7 +7,7 @@ export default function HomePage() {
         <p className="eyebrow">npm para skills de IA</p>
         <h1>Publica, descobre e instala skills para agentes de IA.</h1>
         <p>
-          SkillHub combina um registo web, API REST e CLI Node.js para distribuir pacotes <code>.skill</code> com instruções, scripts, referências e assets reutilizáveis.
+          FateSkill combina um registo web, API REST e CLI Node.js para distribuir pacotes <code>.skill</code> com instruções, scripts, referências e assets reutilizáveis.
         </p>
         <div className="actions">
           <Link href="/skills" className="button">Explorar skills</Link>
@@ -15,10 +15,10 @@ export default function HomePage() {
         </div>
       </div>
       <div className="code-card">
-        <pre>{`npm install -g skillhub-cli
-skillhub search "docx academic"
-skillhub install fofa-tabela-docx
-skillhub info fofa-tabela-docx`}</pre>
+        <pre>{`npm install -g fateskill-cli
+fateskill search "docx academic"
+fateskill install fofa-tabela-docx
+fateskill info fofa-tabela-docx`}</pre>
       </div>
     </section>
   );

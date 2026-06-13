@@ -2,8 +2,8 @@ import { loadConfig, saveConfig } from "../config.js";
 
 export async function loginCommand(token?: string) {
   const config = await loadConfig();
-  config.auth_token = token ?? process.env.SKILLHUB_TOKEN;
-  if (!config.auth_token) throw new Error("Provide a token with --token or SKILLHUB_TOKEN");
+  config.auth_token = token ?? process.env.FATESKILL_TOKEN;
+  if (!config.auth_token) throw new Error("Provide a token with --token or FATESKILL_TOKEN");
   await saveConfig(config);
   console.log("✓ authenticated");
 }

@@ -1,11 +1,11 @@
-# SkillHub — Arquitectura Completa
+# FateSkill — Arquitectura Completa
 > Registo público/privado de Skills para IAs, com CLI e API programática
 
 ---
 
 ## 1. Visão Geral
 
-**SkillHub** é o "npm para skills de IA" — uma plataforma onde qualquer pessoa pode publicar, partilhar e instalar `.skill` files que extendem o comportamento de modelos como Claude. Funciona em três camadas:
+**FateSkill** é o "npm para skills de IA" — uma plataforma onde qualquer pessoa pode publicar, partilhar e instalar `.skill` files que extendem o comportamento de modelos como Claude. Funciona em três camadas:
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -13,7 +13,7 @@
 ├─────────────────────────────────────────────┤
 │              API REST (Next.js routes)       │  Consumo programático
 ├─────────────────────────────────────────────┤
-│              CLI  (Node.js → npm)            │  `skillhub install fofa`
+│              CLI  (Node.js → npm)            │  `fateskill install fofa`
 └─────────────────────────────────────────────┘
          ▼ armazena em ▼
 ┌─────────────────────────────────────────────┐
@@ -54,7 +54,7 @@ fofa-tabela-docx/
     "claude": ">=3.0"
   },
   "repository": "https://github.com/saide/fofa-tabela-docx",
-  "homepage": "https://skillhub.dev/skills/fofa-tabela-docx"
+  "homepage": "https://fateskill.dev/skills/fofa-tabela-docx"
 }
 ```
 
@@ -183,7 +183,7 @@ create policy "author manages skill" on skills
 
 ## 4. API REST
 
-### Base URL: `https://skillhub.dev/api/v1`
+### Base URL: `https://fateskill.dev/api/v1`
 
 ### Endpoints
 
@@ -214,8 +214,8 @@ POST   /auth/token               → criar API token
   "downloads": 1247,
   "stars": 38,
   "tags": ["docx", "academic", "mozambique"],
-  "entry_url": "https://skillhub.dev/api/v1/skills/fofa-tabela-docx/content/SKILL.md",
-  "download_url": "https://skillhub.dev/api/v1/skills/fofa-tabela-docx/download",
+  "entry_url": "https://fateskill.dev/api/v1/skills/fofa-tabela-docx/content/SKILL.md",
+  "download_url": "https://fateskill.dev/api/v1/skills/fofa-tabela-docx/download",
   "versions": ["1.0.0", "1.1.0", "1.2.0"],
   "updated_at": "2026-05-10T14:32:00Z"
 }
@@ -239,53 +239,53 @@ POST   /auth/token               → criar API token
 ### Instalação
 
 ```bash
-npm install -g skillhub-cli
+npm install -g fateskill-cli
 ```
 
 ### Comandos
 
 ```bash
 # Autenticação
-skillhub login                        # abre browser para OAuth
-skillhub logout
-skillhub whoami
+fateskill login                        # abre browser para OAuth
+fateskill logout
+fateskill whoami
 
 # Inicializar nova skill
-skillhub init                         # cria skill.json interactivo
+fateskill init                         # cria skill.json interactivo
 
 # Publicar
-skillhub publish                      # publica versão actual
-skillhub publish --access private     # skill privada
+fateskill publish                      # publica versão actual
+fateskill publish --access private     # skill privada
 
 # Instalar (descarrega para /mnt/skills/user/ por padrão)
-skillhub install fofa-tabela-docx
-skillhub install fofa-tabela-docx@1.1.0    # versão específica
-skillhub install saide/fofa-tabela-docx    # por autor
+fateskill install fofa-tabela-docx
+fateskill install fofa-tabela-docx@1.1.0    # versão específica
+fateskill install saide/fofa-tabela-docx    # por autor
 
 # Listar
-skillhub search "docx academic"
-skillhub list                         # skills instaladas localmente
-skillhub info fofa-tabela-docx
+fateskill search "docx academic"
+fateskill list                         # skills instaladas localmente
+fateskill info fofa-tabela-docx
 
 # Actualizar
-skillhub update                       # actualiza todas
-skillhub update fofa-tabela-docx
+fateskill update                       # actualiza todas
+fateskill update fofa-tabela-docx
 
 # Remover
-skillhub uninstall fofa-tabela-docx
-skillhub unpublish fofa-tabela-docx   # remove do registo
+fateskill uninstall fofa-tabela-docx
+fateskill unpublish fofa-tabela-docx   # remove do registo
 
 # Token de API
-skillhub token create --name "meu-app" --scope publish
-skillhub token list
-skillhub token revoke <id>
+fateskill token create --name "meu-app" --scope publish
+fateskill token list
+fateskill token revoke <id>
 ```
 
-### Configuração (`~/.skillhub/config.json`)
+### Configuração (`~/.fateskill/config.json`)
 
 ```json
 {
-  "registry": "https://skillhub.dev/api/v1",
+  "registry": "https://fateskill.dev/api/v1",
   "install_dir": "/mnt/skills/user",
   "auth_token": "shb_xxxxxxxxxxxx"
 }
@@ -298,7 +298,7 @@ skillhub token revoke <id>
 ### Frontend + Backend (monorepo Next.js 15)
 
 ```
-skillhub/
+fateskill/
 ├── apps/
 │   └── web/                     ← Next.js 15 (App Router)
 │       ├── app/
@@ -358,7 +358,7 @@ skillhub/
 1. Autor cria skill localmente
    └── SKILL.md + skill.json
 
-2. skillhub publish
+2. fateskill publish
    ├── valida skill.json (semver, campos obrigatórios)
    ├── empacota → fofa-tabela-docx-1.2.0.skill (ZIP)
    ├── POST /api/v1/skills com API token
@@ -378,13 +378,13 @@ skillhub/
 ## 8. Fluxo de Instalação (CLI)
 
 ```
-skillhub install fofa-tabela-docx
+fateskill install fofa-tabela-docx
 
 1. GET /api/v1/skills/fofa-tabela-docx          ← resolve última versão
 2. GET /api/v1/skills/fofa-tabela-docx/download ← redirige para Storage URL
 3. Download do .skill (ZIP)
 4. Extrai para /mnt/skills/user/fofa-tabela-docx/
-5. Regista em ~/.skillhub/installed.json
+5. Regista em ~/.fateskill/installed.json
 ```
 
 ---
@@ -396,16 +396,16 @@ skillhub install fofa-tabela-docx
 Qualquer IA com acesso à web pode consumir skills via URL pública:
 
 ```
-GET https://skillhub.dev/api/v1/skills/fofa-tabela-docx/content/SKILL.md
+GET https://fateskill.dev/api/v1/skills/fofa-tabela-docx/content/SKILL.md
 ```
 
 Retorna o SKILL.md em texto puro, pronto para ser injectado no contexto.
 
 ### 9.2 System Prompt Injection Pattern
 
-O utilizador fornece ao Claude uma URL do SkillHub:
+O utilizador fornece ao Claude uma URL do FateSkill:
 ```
-"Usa a skill https://skillhub.dev/s/fofa-tabela-docx neste documento"
+"Usa a skill https://fateskill.dev/s/fofa-tabela-docx neste documento"
 ```
 
 Claude faz `web_fetch` → obtém SKILL.md → executa as instruções.
@@ -417,15 +417,15 @@ Um **MCP Server** oficial que permite ao Claude:
 {
   "tools": [
     {
-      "name": "skillhub_search",
-      "description": "Pesquisar skills no SkillHub registry"
+      "name": "fateskill_search",
+      "description": "Pesquisar skills no FateSkill registry"
     },
     {
-      "name": "skillhub_install",
+      "name": "fateskill_install",
       "description": "Instalar skill e carregar instruções no contexto"
     },
     {
-      "name": "skillhub_read",
+      "name": "fateskill_read",
       "description": "Ler conteúdo de uma skill pelo nome"
     }
   ]
@@ -488,7 +488,7 @@ Retorna JSON optimizado para injecção em sistema de prompts:
 - [ ] Endpoint `/ai-context`
 - [ ] Suporte multi-IA (tags `ai: [claude, gpt, gemini]`)
 - [ ] Organizações + skills de equipa
-- [ ] CLI: `skillhub update`, `skillhub list`
+- [ ] CLI: `fateskill update`, `fateskill list`
 
 ---
 
@@ -497,12 +497,12 @@ Retorna JSON optimizado para injecção em sistema de prompts:
 ```bash
 # Autor publica
 cd ~/skills/fofa-tabela-docx
-skillhub publish
+fateskill publish
 # → fofa-tabela-docx@1.2.0 publicado ✓
-# → https://skillhub.dev/skills/fofa-tabela-docx
+# → https://fateskill.dev/skills/fofa-tabela-docx
 
 # Utilizador instala
-skillhub install fofa-tabela-docx
+fateskill install fofa-tabela-docx
 # → instalado em /mnt/skills/user/fofa-tabela-docx/ ✓
 
 # IA consome via API (web_fetch)

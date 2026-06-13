@@ -19,7 +19,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ na
       <div className="card-grid">
         <article className="detail-panel">
           <h2>Instalação</h2>
-          <pre>{`skillhub install ${skill.name}\nskillhub install ${skill.name}@${skill.version}`}</pre>
+          <pre>{`fateskill install ${skill.name}\nfateskill install ${skill.name}@${skill.version}`}</pre>
         </article>
         <article className="detail-panel">
           <h2>Metadados</h2>

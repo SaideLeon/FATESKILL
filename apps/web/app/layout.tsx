@@ -3,7 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SkillHub",
+  title: "FateSkill",
   description: "Registo público e privado de Skills para IAs, com API e CLI."
 };
 
@@ -12,7 +12,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="pt">
       <body>
         <header className="site-header">
-          <Link href="/" className="brand">SkillHub</Link>
+          <Link href="/" className="brand">FateSkill</Link>
           <nav>
             <Link href="/skills">Skills</Link>
             <Link href="/publish">Publicar</Link>

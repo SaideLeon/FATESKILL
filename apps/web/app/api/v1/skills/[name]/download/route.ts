@@ -11,7 +11,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ name: stri
     return NextResponse.redirect(skill.download_url);
   }
 
-  return new NextResponse(`SkillHub package placeholder for ${skill.name}@${skill.version}\n`, {
+  return new NextResponse(`FateSkill package placeholder for ${skill.name}@${skill.version}\n`, {
     headers: {
       "content-type": "application/octet-stream",
       "content-disposition": `attachment; filename="${skill.name}-${skill.version}.skill"`

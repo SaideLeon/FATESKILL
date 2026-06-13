@@ -10,7 +10,7 @@ import { searchCommand } from "./commands/search.js";
 
 const program = new Command();
 
-program.name("skillhub").description("CLI do SkillHub registry").version("0.1.0");
+program.name("fateskill").description("CLI do FateSkill registry").version("0.1.0");
 program.command("init").option("--name <name>").option("--author <author>").action(initCommand);
 program.command("login").option("--token <token>").action((options: { token?: string }) => loginCommand(options.token));
 program.command("logout").action(logoutCommand);
