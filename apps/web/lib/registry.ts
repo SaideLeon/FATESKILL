@@ -96,6 +96,7 @@ export async function getSkillVersions(name: string): Promise<SkillVersion[] | n
   const skill = await getSkill(name);
   if (!skill) return null;
   return skill.versions.map((version) => ({
+    id: version === skill.version ? skill.version_id : undefined,
     version,
     file_url: skill.download_url,
     is_latest: version === skill.version,
@@ -107,8 +108,12 @@ export async function recordInstall(name: string, source: "cli" | "api" | "web" 
   const supabase = getSupabaseAdmin();
   if (!supabase) return;
   const skill = await getSkill(name);
-  if (!skill) return;
-  await supabase.from("skill_installs").insert({ source });
+  if (!skill?.id || !skill.version_id) return;
+  await supabase.from("skill_installs").insert({
+    skill_id: skill.id,
+    version_id: skill.version_id,
+    source
+  });
 }
 
 export async function publishSkill(input: unknown) {
