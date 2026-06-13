@@ -4,6 +4,10 @@
   "private": true,
   "description": "SkillHub monorepo: web registry, API and CLI for AI skills.",
   "packageManager": "pnpm@10.28.1",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm --filter @skillhub/web dev",
@@ -11,5 +15,8 @@
     "typecheck": "pnpm -r typecheck"
   },
   "keywords": ["ai", "skills", "registry", "cli"],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "next": "^15.0.0"
+  }
 }
