@@ -26,10 +26,26 @@ create table if not exists skills (
   homepage text,
   created_at timestamptz default now(),
   updated_at timestamptz default now(),
-  search_vector tsvector generated always as (
-    to_tsvector('simple', coalesce(name, '') || ' ' || coalesce(description, '') || ' ' || coalesce(category, '') || ' ' || array_to_string(tags, ' '))
-  ) stored
+  search_vector tsvector
 );
+
+create or replace function skills_search_vector_update() returns trigger
+language plpgsql as $$
+begin
+  new.search_vector := to_tsvector(
+    'simple',
+    coalesce(new.name, '') || ' ' ||
+    coalesce(new.description, '') || ' ' ||
+    coalesce(new.category, '') || ' ' ||
+    array_to_string(new.tags, ' ')
+  );
+  return new;
+end;
+$$;
+
+create trigger skills_search_vector_trigger
+before insert or update on skills
+for each row execute function skills_search_vector_update();
 
 create table if not exists skill_versions (
   id uuid primary key default gen_random_uuid(),
