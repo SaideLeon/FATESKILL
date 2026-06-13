@@ -1,6 +1,6 @@
 {
   "name": "fateskill-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "CLI oficial do FateSkill registry.",
   "license": "MIT",
   "type": "module",

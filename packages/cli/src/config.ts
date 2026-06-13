@@ -16,7 +16,7 @@ export async function loadConfig(): Promise<FateSkillConfig> {
   await fs.ensureDir(configDir);
   if (!(await fs.pathExists(configPath))) {
     const defaults: FateSkillConfig = {
-      registry: process.env.FATESKILL_REGISTRY ?? "https://fateskill.dev/api/v1",
+      registry: process.env.FATESKILL_REGISTRY ?? "https://fateskill.vercel.app/api/v1",
       install_dir: process.env.FATESKILL_INSTALL_DIR ?? path.join(os.homedir(), ".fateskill", "skills")
     };
     await fs.writeJson(configPath, defaults, { spaces: 2 });

@@ -54,7 +54,7 @@ fofa-tabela-docx/
     "claude": ">=3.0"
   },
   "repository": "https://github.com/saide/fofa-tabela-docx",
-  "homepage": "https://fateskill.dev/skills/fofa-tabela-docx"
+  "homepage": "https://fateskill.vercel.app/skills/fofa-tabela-docx"
 }
 ```
 
@@ -183,7 +183,7 @@ create policy "author manages skill" on skills
 
 ## 4. API REST
 
-### Base URL: `https://fateskill.dev/api/v1`
+### Base URL: `https://fateskill.vercel.app/api/v1`
 
 ### Endpoints
 
@@ -214,8 +214,8 @@ POST   /auth/token               → criar API token
   "downloads": 1247,
   "stars": 38,
   "tags": ["docx", "academic", "mozambique"],
-  "entry_url": "https://fateskill.dev/api/v1/skills/fofa-tabela-docx/content/SKILL.md",
-  "download_url": "https://fateskill.dev/api/v1/skills/fofa-tabela-docx/download",
+  "entry_url": "https://fateskill.vercel.app/api/v1/skills/fofa-tabela-docx/content/SKILL.md",
+  "download_url": "https://fateskill.vercel.app/api/v1/skills/fofa-tabela-docx/download",
   "versions": ["1.0.0", "1.1.0", "1.2.0"],
   "updated_at": "2026-05-10T14:32:00Z"
 }
@@ -285,7 +285,7 @@ fateskill token revoke <id>
 
 ```json
 {
-  "registry": "https://fateskill.dev/api/v1",
+  "registry": "https://fateskill.vercel.app/api/v1",
   "install_dir": "/mnt/skills/user",
   "auth_token": "shb_xxxxxxxxxxxx"
 }
@@ -396,7 +396,7 @@ fateskill install fofa-tabela-docx
 Qualquer IA com acesso à web pode consumir skills via URL pública:
 
 ```
-GET https://fateskill.dev/api/v1/skills/fofa-tabela-docx/content/SKILL.md
+GET https://fateskill.vercel.app/api/v1/skills/fofa-tabela-docx/content/SKILL.md
 ```
 
 Retorna o SKILL.md em texto puro, pronto para ser injectado no contexto.
@@ -405,7 +405,7 @@ Retorna o SKILL.md em texto puro, pronto para ser injectado no contexto.
 
 O utilizador fornece ao Claude uma URL do FateSkill:
 ```
-"Usa a skill https://fateskill.dev/s/fofa-tabela-docx neste documento"
+"Usa a skill https://fateskill.vercel.app/s/fofa-tabela-docx neste documento"
 ```
 
 Claude faz `web_fetch` → obtém SKILL.md → executa as instruções.
@@ -499,7 +499,7 @@ Retorna JSON optimizado para injecção em sistema de prompts:
 cd ~/skills/fofa-tabela-docx
 fateskill publish
 # → fofa-tabela-docx@1.2.0 publicado ✓
-# → https://fateskill.dev/skills/fofa-tabela-docx
+# → https://fateskill.vercel.app/skills/fofa-tabela-docx
 
 # Utilizador instala
 fateskill install fofa-tabela-docx
