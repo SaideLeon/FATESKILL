@@ -17,7 +17,7 @@ export const sampleSkills: SkillDetail[] = [
     entry_url: "/api/v1/skills/fofa-tabela-docx/content/SKILL.md",
     download_url: "/api/v1/skills/fofa-tabela-docx/download",
     repository: "https://github.com/saide/fofa-tabela-docx",
-    homepage: "https://skillhub.dev/skills/fofa-tabela-docx",
+    homepage: "https://fateskill.dev/skills/fofa-tabela-docx",
     versions: ["1.0.0", "1.1.0", "1.2.0"],
     instructions: "Quando receber uma tabela FOFA/SWOT, normalize cabeçalhos, aplique linguagem académica moçambicana e devolva uma versão pronta para Word."
   },

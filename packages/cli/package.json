@@ -1,10 +1,10 @@
 {
-  "name": "skillhub-cli",
+  "name": "fateskill-cli",
   "version": "0.1.0",
-  "description": "CLI oficial do SkillHub registry.",
+  "description": "CLI oficial do FateSkill registry.",
   "type": "module",
   "bin": {
-    "skillhub": "dist/index.js"
+    "fateskill": "dist/index.js"
   },
   "files": ["dist"],
   "scripts": {

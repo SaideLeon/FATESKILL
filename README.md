@@ -1,6 +1,6 @@
-# SkillHub
+# FateSkill
 
-SkillHub é um registo público/privado de pacotes `.skill` para agentes de IA. Funciona como um **"npm para skills de IA"**: autores publicam skills reutilizáveis, utilizadores instalam via CLI, e agentes consomem instruções directamente por API.
+FateSkill é um registo público/privado de pacotes `.skill` para agentes de IA. Funciona como um **"npm para skills de IA"**: autores publicam skills reutilizáveis, utilizadores instalam via CLI, e agentes consomem instruções directamente por API.
 
 ## Índice
 
@@ -34,7 +34,7 @@ SkillHub é um registo público/privado de pacotes `.skill` para agentes de IA. 
 ├─────────────────────────────────────────────┤
 │              API REST (Next.js routes)      │  Consumo programático
 ├─────────────────────────────────────────────┤
-│              CLI (Node.js → npm)            │  skillhub install <skill>
+│              CLI (Node.js → npm)            │  fateskill install <skill>
 └─────────────────────────────────────────────┘
          ▼ armazena em ▼
 ┌─────────────────────────────────────────────┐
@@ -50,7 +50,7 @@ Sem variáveis Supabase configuradas, a app usa dados de demonstração — úti
 
 - Registry web para descobrir, pesquisar e consultar skills.
 - API REST versionada em `/api/v1`.
-- CLI oficial (`skillhub`) para autenticar, inicializar, publicar, instalar e pesquisar skills.
+- CLI oficial (`fateskill`) para autenticar, inicializar, publicar, instalar e pesquisar skills.
 - Formato `.skill` simples baseado em ZIP renomeado.
 - Manifesto validado com semver, tags, categoria, IA alvo e visibilidade.
 - Visibilidade `public`, `unlisted` e `private`.
@@ -64,9 +64,9 @@ Sem variáveis Supabase configuradas, a app usa dados de demonstração — úti
 | Pasta | Conteúdo |
 | --- | --- |
 | `apps/web` | Next.js 15 com App Router — páginas web e API REST |
-| `packages/cli` | CLI TypeScript/Node.js publicado no npm como `skillhub-cli` |
+| `packages/cli` | CLI TypeScript/Node.js publicado no npm como `fateskill-cli` |
 | `supabase/migrations` | Schema SQL inicial |
-| `skillhub-architecture.md` | Documento de arquitectura completa |
+| `fateskill-architecture.md` | Documento de arquitectura completa |
 
 ---
 
@@ -91,7 +91,7 @@ Sem variáveis Supabase configuradas, a app usa dados de demonstração — úti
 ## Estrutura do monorepo
 
 ```text
-skillhub/
+fateskill/
 ├── .github/workflows/
 │   └── publish-cli.yml          # publica CLI no npm via tag git
 ├── apps/
@@ -110,7 +110,7 @@ skillhub/
 │       │   └── utils/           # empacotamento (.skill) e validação de manifesto
 │       └── package.json
 ├── supabase/migrations/
-│   └── 0001_initial_skillhub.sql
+│   └── 0001_initial_fateskill.sql
 ├── package.json                 # scripts do monorepo (pnpm workspaces)
 ├── pnpm-workspace.yaml
 ├── vercel.json                  # configuração do deploy Vercel
@@ -144,9 +144,9 @@ pnpm build         # build completo (web + CLI)
 Por workspace:
 
 ```bash
-pnpm --filter @skillhub/web dev
-pnpm --filter @skillhub/web build
-pnpm --filter skillhub-cli build
+pnpm --filter @fateskill/web dev
+pnpm --filter @fateskill/web build
+pnpm --filter fateskill-cli build
 ```
 
 ---
@@ -193,7 +193,7 @@ Para configurar o projecto Vercel:
 
 ### CLI (npm)
 
-O CLI é publicado separadamente no npm como `skillhub-cli`. Ver a secção [Publicar o CLI no npm](#publicar-o-cli-no-npm).
+O CLI é publicado separadamente no npm como `fateskill-cli`. Ver a secção [Publicar o CLI no npm](#publicar-o-cli-no-npm).
 
 ---
 
@@ -254,7 +254,7 @@ fofa-tabela-docx-1.2.0.skill  (ZIP)
 Base URL:
 
 ```
-https://skillhub.dev/api/v1
+https://fateskill.dev/api/v1
 ```
 
 ### Endpoints
@@ -286,44 +286,44 @@ GET /skills?q=mozambique&tag=academic&category=document-processing&sort=download
 
 ## CLI
 
-O CLI é um binário Node.js publicado no npm. É **independente da app web** — comunica com a API REST do SkillHub via HTTP.
+O CLI é um binário Node.js publicado no npm. É **independente da app web** — comunica com a API REST do FateSkill via HTTP.
 
 ### Instalação global
 
 ```bash
-npm install -g skillhub-cli
+npm install -g fateskill-cli
 ```
 
 ### Comandos
 
 ```bash
 # Autenticação
-skillhub login --token <token>
-skillhub logout
-skillhub whoami
+fateskill login --token <token>
+fateskill logout
+fateskill whoami
 
 # Criar nova skill localmente
-skillhub init --name minha-skill --author saide
+fateskill init --name minha-skill --author saide
 
 # Publicar no registry
-skillhub publish
-skillhub publish --access private
-skillhub publish --dry-run      # valida sem publicar
+fateskill publish
+fateskill publish --access private
+fateskill publish --dry-run      # valida sem publicar
 
 # Instalar skills
-skillhub install fofa-tabela-docx
-skillhub install fofa-tabela-docx@1.1.0
-skillhub install saide/fofa-tabela-docx
+fateskill install fofa-tabela-docx
+fateskill install fofa-tabela-docx@1.1.0
+fateskill install saide/fofa-tabela-docx
 
 # Descobrir e consultar
-skillhub search "docx academic" --sort downloads
-skillhub info fofa-tabela-docx
-skillhub list                   # skills instaladas localmente
+fateskill search "docx academic" --sort downloads
+fateskill info fofa-tabela-docx
+fateskill list                   # skills instaladas localmente
 
 # Em desenvolvimento
-skillhub update [nome]
-skillhub uninstall <nome>
-skillhub token
+fateskill update [nome]
+fateskill uninstall <nome>
+fateskill token
 ```
 
 ### Como funciona a instalação de skills
@@ -331,22 +331,22 @@ skillhub token
 O CLI **não usa npm/pnpm** para instalar skills. Usa a API REST:
 
 ```
-skillhub install fofa-tabela-docx
+fateskill install fofa-tabela-docx
        ↓
 1. GET /api/v1/skills/fofa-tabela-docx     → resolve versão e metadados
 2. GET /api/v1/skills/fofa-tabela-docx/download → descarrega .skill (ZIP)
-3. Extrai para ~/.skillhub/skills/fofa-tabela-docx/
-4. Regista em ~/.skillhub/installed.json
+3. Extrai para ~/.fateskill/skills/fofa-tabela-docx/
+4. Regista em ~/.fateskill/installed.json
 ```
 
 ### Configuração do CLI
 
-Ficheiro `~/.skillhub/config.json` (criado automaticamente):
+Ficheiro `~/.fateskill/config.json` (criado automaticamente):
 
 ```json
 {
-  "registry": "https://skillhub.dev/api/v1",
-  "install_dir": "~/.skillhub/skills",
+  "registry": "https://fateskill.dev/api/v1",
+  "install_dir": "~/.fateskill/skills",
   "auth_token": "shb_xxxxxxxxxxxx"
 }
 ```
@@ -354,19 +354,19 @@ Ficheiro `~/.skillhub/config.json` (criado automaticamente):
 Variáveis de ambiente opcionais:
 
 ```bash
-SKILLHUB_REGISTRY=https://skillhub.dev/api/v1
-SKILLHUB_INSTALL_DIR=~/.skillhub/skills
-SKILLHUB_TOKEN=shb_xxxxxxxxxxxx
+FATESKILL_REGISTRY=https://fateskill.dev/api/v1
+FATESKILL_INSTALL_DIR=~/.fateskill/skills
+FATESKILL_TOKEN=shb_xxxxxxxxxxxx
 ```
 
 ### Build local do CLI
 
 ```bash
-pnpm --filter skillhub-cli build
+pnpm --filter fateskill-cli build
 # → compila TypeScript para packages/cli/dist/
 
-pnpm --filter skillhub-cli exec skillhub init --name teste
-pnpm --filter skillhub-cli exec skillhub publish --dry-run
+pnpm --filter fateskill-cli exec fateskill init --name teste
+pnpm --filter fateskill-cli exec fateskill publish --dry-run
 ```
 
 ---
@@ -388,7 +388,7 @@ O repositório inclui um workflow GitHub Actions que publica o CLI automaticamen
 # 2. Cria a tag e faz push
 git tag cli@1.0.0
 git push origin cli@1.0.0
-# → GitHub Actions compila e publica skillhub-cli@1.0.0 no npm
+# → GitHub Actions compila e publica fateskill-cli@1.0.0 no npm
 ```
 
 ### Publicação manual
@@ -408,7 +408,7 @@ npm publish --access public
 Qualquer agente com acesso à web pode carregar instruções sem instalar nada:
 
 ```
-GET https://skillhub.dev/api/v1/skills/fofa-tabela-docx/content/SKILL.md
+GET https://fateskill.dev/api/v1/skills/fofa-tabela-docx/content/SKILL.md
 ```
 
 Retorna o `SKILL.md` em texto puro para injecção directa no contexto.
@@ -416,7 +416,7 @@ Retorna o `SKILL.md` em texto puro para injecção directa no contexto.
 ### Padrão de uso em prompt
 
 ```
-Usa a skill https://skillhub.dev/s/fofa-tabela-docx neste documento.
+Usa a skill https://fateskill.dev/s/fofa-tabela-docx neste documento.
 ```
 
 O agente faz fetch à URL, carrega as instruções e executa.
@@ -439,13 +439,13 @@ GET /api/v1/skills/:name/ai-context
 
 ### MCP Server (fase 2)
 
-Previsto um MCP Server oficial com ferramentas `skillhub_search`, `skillhub_install` e `skillhub_read` para integração nativa com Claude e outros agentes.
+Previsto um MCP Server oficial com ferramentas `fateskill_search`, `fateskill_install` e `fateskill_read` para integração nativa com Claude e outros agentes.
 
 ---
 
 ## Base de dados Supabase
 
-A migração `supabase/migrations/0001_initial_skillhub.sql` cria:
+A migração `supabase/migrations/0001_initial_fateskill.sql` cria:
 
 | Tabela | Conteúdo |
 | --- | --- |

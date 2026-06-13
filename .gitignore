@@ -9,4 +9,4 @@ coverage/
 !.env.example
 .DS_Store
 *.skill
-.skillhub/
+.fateskill/

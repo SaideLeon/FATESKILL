@@ -6,7 +6,7 @@ import type { SkillManifest } from "./manifest.js";
 const includedEntries = ["skill.json", "SKILL.md", "scripts", "references", "assets"];
 
 export async function packageSkill(directory: string, manifest: SkillManifest): Promise<{ filePath: string; size: number }> {
-  const outDir = path.join(directory, ".skillhub");
+  const outDir = path.join(directory, ".fateskill");
   await fs.ensureDir(outDir);
   const filePath = path.join(outDir, `${manifest.name}-${manifest.version}.skill`);
   const zip = new AdmZip();
