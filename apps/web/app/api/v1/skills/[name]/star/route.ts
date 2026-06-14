@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveApiUser } from "@/lib/auth";
-import { getSkill } from "@/lib/registry";
+import { getSkillForViewer } from "@/lib/registry";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ name: string }> }) {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const supabase = getSupabaseAdmin();
   if (!supabase) return NextResponse.json({ name, starred: true, dry_run: true });
 
-  const skill = await getSkill(name);
+  const skill = await getSkillForViewer(name, auth.userId);
   if (!skill?.id) return NextResponse.json({ error: "Skill not found" }, { status: 404 });
 
   const { error: insertError } = await supabase.from("skill_stars").insert({ user_id: auth.userId, skill_id: skill.id });
@@ -29,7 +29,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   const supabase = getSupabaseAdmin();
   if (!supabase) return NextResponse.json({ name, starred: false, dry_run: true });
 
-  const skill = await getSkill(name);
+  const skill = await getSkillForViewer(name, auth.userId);
   if (!skill?.id) return NextResponse.json({ error: "Skill not found" }, { status: 404 });
 
   const { error: deleteError, count } = await supabase

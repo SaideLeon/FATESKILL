@@ -2,26 +2,44 @@ import { unstable_noStore as noStore } from "next/cache";
 import { z } from "zod";
 import { sampleSkills } from "./sample-data";
 import { getSupabaseAdmin } from "./supabase";
+import { getSupabaseUserScoped } from "./supabase-user-scoped";
 import type { SearchParams, SkillDetail, SkillSummary, SkillVersion } from "./types";
 
-export const publishSkillSchema = z.object({
-  name: z.string().min(2).regex(/^[a-z0-9][a-z0-9-]*$/),
-  version: z.string().regex(/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/),
-  description: z.string().min(8),
-  author: z.string().min(2),
-  visibility: z.enum(["public", "private", "unlisted"]).default("public"),
-  category: z.string().optional().default("uncategorized"),
-  tags: z.array(z.string()).default([]),
-  ai: z.array(z.string()).default(["claude"]),
-  repository: z.string().url().optional().nullable(),
-  homepage: z.string().url().optional().nullable(),
-  changelog: z.string().optional().nullable(),
-  file_url: z.string().url().optional(),
-  file_size: z.number().int().positive().optional()
-});
+const httpUrlSchema = z.string().max(300).refine((value) => {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}, "URL must be http(s) and at most 300 characters");
 
-function escapePostgrestLikePattern(value: string) {
-  return value.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_").replace(/"/g, '\\"');
+export const publishSkillSchema = z.object({
+  name: z.string().min(2).max(60).regex(/^[a-z0-9][a-z0-9-]*$/),
+  version: z.string().regex(/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/),
+  description: z.string().min(8).max(2000),
+  author: z.string().min(2).max(60),
+  visibility: z.enum(["public", "private", "unlisted"]).default("public"),
+  category: z.string().max(60).optional().default("uncategorized"),
+  tags: z.array(z.string().min(1).max(30)).max(10).default([]),
+  ai: z.array(z.string().max(20)).max(5).default(["claude"]),
+  repository: httpUrlSchema.optional().nullable(),
+  homepage: httpUrlSchema.optional().nullable(),
+  changelog: z.string().max(10_000).optional().nullable(),
+  file_url: httpUrlSchema.optional(),
+  file_size: z.number().int().positive().max(50 * 1024 * 1024).optional()
+}).strict();
+
+const SEARCH_QUERY_MAX_LENGTH = 100;
+
+function sanitizeSearchQuery(value: string) {
+  return value
+    .slice(0, SEARCH_QUERY_MAX_LENGTH)
+    .replace(/[,()."]/g, " ")
+    .replace(/\\/g, "\\\\")
+    .replace(/%/g, "\\%")
+    .replace(/_/g, "\\_")
+    .trim();
 }
 
 export function parseSearchParams(searchParams: URLSearchParams): SearchParams {
@@ -53,11 +71,17 @@ export async function listSkills(params: SearchParams = {}): Promise<{ data: Ski
         .select("*", { count: "exact" });
 
       if (params.q) {
-        if (searchMode === "full-text") {
-          query = query.textSearch("search_vector", params.q, { type: "websearch" });
-        } else {
-          const pattern = `%${escapePostgrestLikePattern(params.q)}%`;
-          query = query.or(`name.ilike."${pattern}",description.ilike."${pattern}",author.ilike."${pattern}"`);
+        const safeQ = sanitizeSearchQuery(params.q);
+        if (safeQ && searchMode === "full-text") {
+          query = query.textSearch("search_vector", safeQ, { type: "websearch" });
+        } else if (safeQ) {
+          const pattern = `%${safeQ}%`;
+          const filters = [
+            `name.ilike.${JSON.stringify(pattern)}`,
+            `description.ilike.${JSON.stringify(pattern)}`,
+            `author.ilike.${JSON.stringify(pattern)}`
+          ];
+          query = query.or(filters.join(","));
         }
       }
 
@@ -109,11 +133,74 @@ export async function getSkill(name: string): Promise<SkillDetail | null> {
   return sampleSkills.find((skill) => skill.name === name || skill.slug === name) ?? null;
 }
 
+
+export async function getSkillOwnerInfo(name: string) {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from("skills")
+    .select("id, name, author_id, visibility")
+    .eq("name", name)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data as { id: string; name: string; author_id: string; visibility: string };
+}
+
+export async function getSkillForViewer(name: string, viewerUserId?: string | null): Promise<SkillDetail | null> {
+  noStore();
+  const publicSkill = await getSkill(name);
+  if (publicSkill) return publicSkill;
+
+  const supabase = getSupabaseAdmin();
+  if (!supabase || !viewerUserId) return null;
+
+  const { data, error } = await supabase
+    .from("skills")
+    .select(`
+      id, name, slug, description, visibility, downloads, stars, tags, category, ai_targets,
+      repository, homepage, updated_at, author_id,
+      skill_versions(id, version, file_url, instructions, is_latest)
+    `)
+    .eq("name", name)
+    .eq("author_id", viewerUserId)
+    .eq("skill_versions.is_latest", true)
+    .maybeSingle();
+
+  if (error || !data) return null;
+
+  const versions = ((data.skill_versions ?? []) as { id?: string; version: string; file_url?: string; instructions?: string; is_latest?: boolean }[]);
+  const latestVersion = versions[0];
+
+  return {
+    id: data.id,
+    name: data.name,
+    slug: data.slug,
+    version: latestVersion?.version ?? "0.0.0",
+    version_id: latestVersion?.id,
+    description: data.description,
+    author: "you",
+    visibility: data.visibility,
+    downloads: data.downloads,
+    stars: data.stars,
+    tags: data.tags ?? [],
+    category: data.category ?? "uncategorized",
+    ai_targets: data.ai_targets ?? [],
+    repository: data.repository,
+    homepage: data.homepage,
+    updated_at: data.updated_at,
+    entry_url: `/api/v1/skills/${data.name}/content/SKILL.md`,
+    download_url: latestVersion?.file_url ?? `/api/v1/skills/${data.name}/download`,
+    versions: versions.map((version) => version.version),
+    instructions: latestVersion?.instructions
+  } as SkillDetail;
+}
+
 export async function getSkillVersion(name: string, version: string): Promise<(SkillDetail & { requested_version: string }) | null> {
   const skill = await getSkill(name);
   if (!skill || !skill.versions.includes(version)) return null;
   return { ...skill, version, requested_version: version };
 }
+
 
 export async function getSkillVersions(name: string): Promise<SkillVersion[] | null> {
   const skill = await getSkill(name);
@@ -141,9 +228,10 @@ export async function recordInstall(name: string, source: "cli" | "api" | "web" 
   await supabase.rpc("increment_skill_downloads", { p_skill_id: skill.id });
 }
 
-export async function publishSkill(input: unknown, userId?: string) {
+export async function publishSkill(input: unknown, auth?: string | { userId: string; accessToken?: string }) {
   const payload = publishSkillSchema.parse(input);
-  const supabase = getSupabaseAdmin();
+  const userId = typeof auth === "string" ? auth : auth?.userId;
+  const supabase = auth && typeof auth !== "string" && auth.accessToken ? getSupabaseUserScoped(auth.accessToken) : getSupabaseAdmin();
   if (!supabase) {
     return {
       ...payload,
@@ -169,6 +257,9 @@ export async function publishSkill(input: unknown, userId?: string) {
     throw new Error("FORBIDDEN: skill já pertence a outro autor");
   }
 
+  // ⚠️ NUNCA substituir este objecto por `...payload` ou `...body` directo no
+  // upsert/insert do Supabase. Cada campo escrito deve estar listado
+  // explicitamente aqui. Ver R18 no blueprint de segurança.
   const skillMutation = {
     name: payload.name,
     slug: payload.name,

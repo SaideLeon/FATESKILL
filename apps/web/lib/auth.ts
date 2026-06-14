@@ -7,6 +7,7 @@ export type ApiAuth = {
   userId: string;
   scopes: string[];
   via: "cookie" | "token";
+  accessToken?: string;
 };
 
 export async function resolveApiUser(request: NextRequest): Promise<ApiAuth | null> {
@@ -36,5 +37,6 @@ export async function resolveApiUser(request: NextRequest): Promise<ApiAuth | nu
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  return { userId: user.id, scopes: ["read", "publish", "admin"], via: "cookie" };
+  const { data: sessionData } = await supabase.auth.getSession();
+  return { userId: user.id, scopes: ["read", "publish", "admin"], via: "cookie", accessToken: sessionData.session?.access_token };
 }
