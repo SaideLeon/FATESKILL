@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">FateSkill icon</title>
+  <desc id="desc">A dark rounded square with a cyan skill cube, orbit ring, sparkle and FateSkill monogram.</desc>
+  <defs>
+    <linearGradient id="bg" x1="64" x2="448" y1="48" y2="464" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#17243a"/>
+      <stop offset="0.48" stop-color="#08111f"/>
+      <stop offset="1" stop-color="#03111f"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="128" x2="384" y1="104" y2="408" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#bae6fd"/>
+      <stop offset="0.44" stop-color="#7dd3fc"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.22 0 0 0 0 0.74 0 0 0 0 0.97 0 0 0 0.72 0" result="cyanGlow"/>
+      <feMerge>
+        <feMergeNode in="cyanGlow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path d="M78 156c54-94 212-118 316-46 68 47 87 128 61 194-28 71-103 120-190 119-103-1-188-69-207-159-8-38-1-75 20-108Z" fill="#38bdf8" opacity="0.12"/>
+  <path d="M116 310c76 70 214 70 288 0" fill="none" stroke="#7dd3fc" stroke-width="18" stroke-linecap="round" opacity="0.42"/>
+  <path d="M111 204c47-70 151-104 246-70" fill="none" stroke="#38bdf8" stroke-width="12" stroke-linecap="round" opacity="0.34"/>
+
+  <g filter="url(#glow)">
+    <path d="M256 112 365 176v128L256 368 147 304V176l109-64Z" fill="#08111f" stroke="url(#cyan)" stroke-width="18" stroke-linejoin="round"/>
+    <path d="M147 176 256 240l109-64M256 240v128" fill="none" stroke="url(#cyan)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M211 191h93M211 237h73M211 283h50" fill="none" stroke="#e8eefb" stroke-width="26" stroke-linecap="round"/>
+  </g>
+
+  <path d="M388 92 402 124l32 14-32 14-14 32-14-32-32-14 32-14 14-32Z" fill="#bae6fd"/>
+  <path d="M118 348 128 371l23 10-23 10-10 23-10-23-23-10 23-10 10-23Z" fill="#7dd3fc" opacity="0.9"/>
+  <circle cx="408" cy="356" r="18" fill="#38bdf8" opacity="0.82"/>
+  <circle cx="104" cy="146" r="12" fill="#bae6fd" opacity="0.72"/>
+</svg>
