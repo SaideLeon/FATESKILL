@@ -238,7 +238,7 @@ export default function PublishPage() {
               </label>
               <input
                 name="version"
-                placeholder="1.1"
+                placeholder="1.1.1"
                 value={manifest.version}
                 onChange={(event) => setManifest((previous) => ({ ...previous, version: event.target.value }))}
                 disabled={step === "uploading"}
@@ -377,9 +377,11 @@ export default function PublishPage() {
           margin-top: 2rem;
         }
         @media (max-width: 760px) {
-          .publish-layout { grid-template-columns: 1fr; }
+          .publish-layout { gap: 1rem; grid-template-columns: 1fr; margin-top: 1.5rem; }
+          .drop-zone { border-radius: 18px; padding: 2rem 1rem; }
           .form-grid { grid-template-columns: 1fr; }
           .field-row.full { grid-column: 1; }
+          .publish-success, .publish-error { border-radius: 18px; padding: 1.25rem; }
         }
       `}</style>
     </section>
