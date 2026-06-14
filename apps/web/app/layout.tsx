@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import { LogoutButton } from "@/components/logout-button";
+import { getSupabaseServer } from "@/lib/supabase-server";
 
 export const metadata: Metadata = {
   title: "FateSkill",
   description: "Registo público e privado de Skills para IAs, com API e CLI."
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const supabase = await getSupabaseServer();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <html lang="pt">
       <body>
@@ -17,6 +22,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <Link href="/skills">Skills</Link>
             <Link href="/publish">Publicar</Link>
             <Link href="/dashboard">Dashboard</Link>
+            {user ? (
+              <>
+                <Link href="/settings">{user.email}</Link>
+                <LogoutButton />
+              </>
+            ) : (
+              <Link href="/login">Entrar</Link>
+            )}
           </nav>
         </header>
         <main>{children}</main>
