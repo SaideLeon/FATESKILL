@@ -1,19 +1,28 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
+const PROTECTED_PREFIXES = ["/dashboard", "/publish", "/settings"];
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
+  const isProtected = PROTECTED_PREFIXES.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) return response;
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (isProtected) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
+      loginUrl.searchParams.set("reason", "auth-not-configured");
+      return NextResponse.redirect(loginUrl);
+    }
+    return response;
+  }
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
+      getAll() { return request.cookies.getAll(); },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
@@ -23,9 +32,6 @@ export async function middleware(request: NextRequest) {
   });
 
   const { data: { user } } = await supabase.auth.getUser();
-  const protectedPrefixes = ["/dashboard", "/publish", "/settings"];
-  const isProtected = protectedPrefixes.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
-
   if (isProtected && !user) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", request.nextUrl.pathname);

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type Token = { id: string; name: string; scopes: string[]; created_at: string };
+type Token = { id: string; name: string; scopes: string[]; created_at: string; expires_at?: string | null };
 
 export function TokenManager({ initialTokens }: { initialTokens: Token[] }) {
   const [tokens, setTokens] = useState(initialTokens);
@@ -21,10 +21,20 @@ export function TokenManager({ initialTokens }: { initialTokens: Token[] }) {
     const data = await response.json();
     if (response.ok) {
       setCreated(data.token);
-      setTokens((previous) => [{ id: data.id, name: data.name, scopes: data.scopes, created_at: data.created_at }, ...previous]);
+      setTokens((previous) => [{ id: data.id, name: data.name, scopes: data.scopes, created_at: data.created_at, expires_at: data.expires_at }, ...previous]);
       setName("");
     } else {
       setError(data.error ?? "Não foi possível criar o token");
+    }
+  };
+
+  const revokeToken = async (id: string) => {
+    setError(null);
+    const response = await fetch(`/api/v1/auth/token/${id}`, { method: "DELETE" });
+    if (response.ok) {
+      setTokens((previous) => previous.filter((token) => token.id !== id));
+    } else {
+      setError("Não foi possível revogar o token");
     }
   };
 
@@ -48,7 +58,15 @@ export function TokenManager({ initialTokens }: { initialTokens: Token[] }) {
       {created && <p style={{ color: "var(--brand)" }}>Token criado (copia agora, não será mostrado novamente): <code>{created}</code></p>}
       {error && <p style={{ color: "#f87171" }}>{error}</p>}
       <ul>
-        {tokens.map((token) => <li key={token.id}>{token.name} — {token.scopes.join(", ")} — {new Date(token.created_at).toLocaleString("pt-PT")}</li>)}
+        {tokens.map((token) => (
+          <li key={token.id} style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+            <span>
+              {token.name} — {token.scopes.join(", ")} — criado {new Date(token.created_at).toLocaleString("pt-PT")}
+              {token.expires_at && <> · expira {new Date(token.expires_at).toLocaleDateString("pt-PT")}</>}
+            </span>
+            <button onClick={() => revokeToken(token.id)} className="button secondary" type="button">Revogar</button>
+          </li>
+        ))}
       </ul>
     </div>
   );
