@@ -225,7 +225,7 @@ export default function PublishPage() {
               </label>
               <input
                 name="name"
-                placeholder="fofa-tabela-docx"
+                placeholder="security-audit"
                 value={manifest.name}
                 onChange={(event) => setManifest((previous) => ({ ...previous, name: event.target.value }))}
                 disabled={step === "uploading"}
@@ -238,7 +238,7 @@ export default function PublishPage() {
               </label>
               <input
                 name="version"
-                placeholder="1.0.0"
+                placeholder="1.1"
                 value={manifest.version}
                 onChange={(event) => setManifest((previous) => ({ ...previous, version: event.target.value }))}
                 disabled={step === "uploading"}
@@ -252,7 +252,7 @@ export default function PublishPage() {
               <textarea
                 name="description"
                 rows={3}
-                placeholder="O que esta skill faz..."
+                placeholder="Auditoria completa de segurança de código de repositórios. Use esta skill SEMPRE que o utilizador enviar código, colar trechos de ficheiros, mencionar um repositório, ou pedir para analisar, verificar, auditar, revisar segurança, testar vulnerabilidades ou checar o código."
                 value={manifest.description}
                 onChange={(event) => setManifest((previous) => ({ ...previous, description: event.target.value }))}
                 disabled={step === "uploading"}
@@ -265,7 +265,7 @@ export default function PublishPage() {
               </label>
               <input
                 name="author"
-                placeholder="username"
+                placeholder="Saíde Omar Saíde"
                 value={manifest.author}
                 onChange={(event) => setManifest((previous) => ({ ...previous, author: event.target.value }))}
                 disabled={step === "uploading"}
@@ -276,7 +276,7 @@ export default function PublishPage() {
               <label>Categoria</label>
               <input
                 name="category"
-                placeholder="document-processing"
+                placeholder="Segurança"
                 value={manifest.category}
                 onChange={(event) => setManifest((previous) => ({ ...previous, category: event.target.value }))}
                 disabled={step === "uploading"}
@@ -287,7 +287,7 @@ export default function PublishPage() {
               <label>Tags</label>
               <input
                 name="tags"
-                placeholder="docx, academic, mozambique"
+                placeholder="vulnerabilidades, revisar segurança, auditoria, código"
                 value={manifest.tags}
                 onChange={(event) => setManifest((previous) => ({ ...previous, tags: event.target.value }))}
                 disabled={step === "uploading"}
