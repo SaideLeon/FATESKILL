@@ -238,7 +238,7 @@ export default function PublishPage() {
               </label>
               <input
                 name="version"
-                placeholder="1.1"
+                placeholder="1.1.1"
                 value={manifest.version}
                 onChange={(event) => setManifest((previous) => ({ ...previous, version: event.target.value }))}
                 disabled={step === "uploading"}
