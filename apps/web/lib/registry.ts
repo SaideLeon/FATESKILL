@@ -104,7 +104,7 @@ export async function getSkillVersions(name: string): Promise<SkillVersion[] | n
   }));
 }
 
-export async function recordInstall(name: string, source: "cli" | "api" | "web" = "api") {
+export async function recordInstall(name: string, source: "cli" | "api" | "web" = "api", userId?: string | null) {
   const supabase = getSupabaseAdmin();
   if (!supabase) return;
   const skill = await getSkill(name);
@@ -112,11 +112,13 @@ export async function recordInstall(name: string, source: "cli" | "api" | "web" 
   await supabase.from("skill_installs").insert({
     skill_id: skill.id,
     version_id: skill.version_id,
+    user_id: userId ?? null,
     source
   });
+  await supabase.rpc("increment_skill_downloads", { p_skill_id: skill.id });
 }
 
-export async function publishSkill(input: unknown) {
+export async function publishSkill(input: unknown, userId?: string) {
   const payload = publishSkillSchema.parse(input);
   const supabase = getSupabaseAdmin();
   if (!supabase) {
@@ -131,20 +133,45 @@ export async function publishSkill(input: unknown) {
     };
   }
 
-  const { data: skill, error: skillError } = await supabase
+  if (!userId) throw new Error("UNAUTHENTICATED");
+
+  const { data: existingSkill, error: existingError } = await supabase
     .from("skills")
-    .upsert({
-      name: payload.name,
-      slug: payload.name,
-      description: payload.description,
-      visibility: payload.visibility,
-      category: payload.category,
-      tags: payload.tags,
-      ai_targets: payload.ai,
-      updated_at: new Date().toISOString()
-    }, { onConflict: "name" })
-    .select("id,name,slug")
-    .single();
+    .select("id,name,slug,author_id")
+    .eq("name", payload.name)
+    .maybeSingle();
+
+  if (existingError) throw new Error(existingError.message);
+  if (existingSkill?.author_id && existingSkill.author_id !== userId) {
+    throw new Error("FORBIDDEN: skill já pertence a outro autor");
+  }
+
+  const skillMutation = {
+    name: payload.name,
+    slug: payload.name,
+    author_id: userId,
+    description: payload.description,
+    visibility: payload.visibility,
+    category: payload.category,
+    tags: payload.tags,
+    ai_targets: payload.ai,
+    repository: payload.repository ?? null,
+    homepage: payload.homepage ?? null,
+    updated_at: new Date().toISOString()
+  };
+
+  const { data: skill, error: skillError } = existingSkill
+    ? await supabase
+      .from("skills")
+      .update(skillMutation)
+      .eq("id", existingSkill.id)
+      .select("id,name,slug,author_id")
+      .single()
+    : await supabase
+      .from("skills")
+      .insert(skillMutation)
+      .select("id,name,slug,author_id")
+      .single();
 
   if (skillError) throw new Error(skillError.message);
 
