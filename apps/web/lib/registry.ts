@@ -20,6 +20,10 @@ export const publishSkillSchema = z.object({
   file_size: z.number().int().positive().optional()
 });
 
+function escapePostgrestLikePattern(value: string) {
+  return value.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_").replace(/"/g, '\\"');
+}
+
 export function parseSearchParams(searchParams: URLSearchParams): SearchParams {
   return {
     q: searchParams.get("q") ?? undefined,
@@ -39,20 +43,39 @@ export async function listSkills(params: SearchParams = {}): Promise<{ data: Ski
   const supabase = getSupabaseAdmin();
 
   if (supabase) {
-    let query = supabase
-      .from("skills_public_view")
-      .select("*", { count: "exact" });
-
-    if (params.q) query = query.textSearch("search_vector", params.q, { type: "websearch" });
-    if (params.tag) query = query.contains("tags", [params.tag]);
-    if (params.category) query = query.eq("category", params.category);
-    if (params.author) query = query.eq("author", params.author);
-
     const sortColumn = params.sort === "downloads" ? "downloads" : params.sort === "stars" ? "stars" : "updated_at";
-    query = query.order(sortColumn, { ascending: false }).range((page - 1) * limit, page * limit - 1);
+    const from = (page - 1) * limit;
+    const to = page * limit - 1;
 
-    const { data, error, count } = await query;
+    const buildQuery = (searchMode: "full-text" | "contains") => {
+      let query = supabase
+        .from("skills_public_view")
+        .select("*", { count: "exact" });
+
+      if (params.q) {
+        if (searchMode === "full-text") {
+          query = query.textSearch("search_vector", params.q, { type: "websearch" });
+        } else {
+          const pattern = `%${escapePostgrestLikePattern(params.q)}%`;
+          query = query.or(`name.ilike."${pattern}",description.ilike."${pattern}",author.ilike."${pattern}"`);
+        }
+      }
+
+      if (params.tag) query = query.contains("tags", [params.tag]);
+      if (params.category) query = query.eq("category", params.category);
+      if (params.author) query = query.eq("author", params.author);
+
+      return query.order(sortColumn, { ascending: false }).range(from, to);
+    };
+
+    let { data, error, count } = await buildQuery("full-text");
     if (error) throw new Error(error.message);
+
+    if (params.q && (data ?? []).length === 0) {
+      ({ data, error, count } = await buildQuery("contains"));
+      if (error) throw new Error(error.message);
+    }
+
     return { data: (data ?? []) as SkillSummary[], page, limit, total: count ?? 0 };
   }
 
