@@ -17,9 +17,10 @@ export default function HomePage() {
         </div>
         <div className="code-card">
           <pre>{`npm install -g fateskill-cli
-fateskill search "docx academic"
-fateskill install fofa-tabela-docx
-fateskill info fofa-tabela-docx`}</pre>
+fateskill search "vulnerabilidade"
+fateskill install security-audit
+fateskill install security-audit@1.1.1
+fateskill info security-audit`}</pre>
         </div>
       </section>
 

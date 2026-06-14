@@ -1,12 +1,28 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { LogoutButton } from "@/components/logout-button";
+import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import { getSupabaseServer } from "@/lib/supabase-server";
 
 export const metadata: Metadata = {
   title: "FateSkill",
-  description: "Registo público e privado de Skills para IAs, com API e CLI."
+  description: "Registo público e privado de Skills para IAs, com API e CLI.",
+  applicationName: "FateSkill",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "FateSkill"
+  },
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg"
+  }
+};
+
+export const viewport: Viewport = {
+  themeColor: "#38bdf8"
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -33,6 +49,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           </nav>
         </header>
         <main>{children}</main>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
